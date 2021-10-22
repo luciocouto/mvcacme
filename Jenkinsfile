@@ -11,22 +11,7 @@ def additionalProperties = [
 //PROPERTIES
 propertiesGlobalSetup(vertical, productName, projectName, additionalProperties)
 try {
-  podTemplate(
-        label: label,
-        containers: [
-            containerTemplate(
-                name: 'dotnet',
-                image: 'mcr.microsoft.com/dotnet/sdk:3.1',
-                alwaysPullImage: false,
-                command: 'sh',
-                ttyEnabled: true,
-                privileged: true),
-            containerTemplateDocker('docker'),
-        ],
-        imagePullSecrets: getPodTemplateImagePullSecrets(),
-        volumes: getPodTemplateVolumes()
-    ) {
-        node(label) {
+        node(main) {
             container('dotnet') {
                 try{
                     // Efetua o chackout da solution
@@ -46,10 +31,7 @@ try {
                             echo 'Execução sonar desabilitada'
                             echo 'Não é necessário instalar Java'
                         }
-                    }
-                     stage('SCM') {
-                                    git 'https://github.com/foo/bar.git'
-                                  }
+                    }                   
 
                     // Inicia analise para sonarQube
                     stage('SonarQube Begin') {
@@ -60,9 +42,9 @@ try {
                             sh 'dotnet tool restore'
 
                             def SONAR_PROJECT_KEY= 'TesteJenkins'
-                            def SONAR_URL= 'http://localhost:19000'
+                            def SONAR_URL= 'http://localhost:29000'
                             
-                            withSonarQubeEnv('http://localhost:19000') {
+                            withSonarQubeEnv('http://localhost:29000') {
 
                                 def cmd = "dotnet tool run dotnet-sonarscanner begin"
                                 cmd += " /k:\"${SONAR_PROJECT_KEY}\""
@@ -83,7 +65,7 @@ try {
                     // Finaliza analise para sonarqube e envia resultados
                     stage('SonarQube end') {
                         if(params.executaAnaliseSonar) {
-                             withSonarQubeEnv('http://localhost:19000') {
+                             withSonarQubeEnv('http://localhost:29000') {
                                 def cmd = "dotnet tool run dotnet-sonarscanner end"
 
                                 echo 'Execução fim sonar'
@@ -100,11 +82,8 @@ try {
                 }
             }
         }
-    }
 }
 catch (e) {
   currentBuild.result = 'FAILURE'
   throw e
 }
-finally {
-    onFinally(vertical, productName, projectName )
