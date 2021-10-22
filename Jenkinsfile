@@ -9,7 +9,7 @@ def additionalProperties = [
 ]
 
 try {
-        node('main') {
+        node("main") {
             container('dotnet') {
                 try{
                     // Efetua o checkout da solution
