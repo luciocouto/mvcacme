@@ -8,8 +8,6 @@ def additionalProperties = [
     ])
 ]
 
-//PROPERTIES
-propertiesGlobalSetup(vertical, productName, projectName, additionalProperties)
 try {
         node(main) {
             container('dotnet') {
