@@ -9,10 +9,10 @@ def additionalProperties = [
 ]
 
 try {
-        node(main) {
+        node('main') {
             container('dotnet') {
                 try{
-                    // Efetua o chackout da solution
+                    // Efetua o checkout da solution
                     stage('Checkout') {
                         scmVars = checkout scm
                     }
