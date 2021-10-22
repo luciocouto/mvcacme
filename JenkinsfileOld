@@ -1,0 +1,57 @@
+node("master") {
+
+	try {	         
+
+
+		stage('SCM') {
+
+			git branch: 'master', 
+			credentialsId: 'bitbucket', 
+			url: 'https://luciocouto2@bitbucket.org/luciocouto2/mvcacme.git'
+		}
+
+		stage('Mvn Package'){
+
+			sh 'mvn clean package'
+		}
+
+		stage('SonarQube analysis') {
+
+			withSonarQubeEnv('sonarqube') {
+
+				sh 'mvn sonar:sonar -Dsonar.projectKey=mvcacme-Dsonar.host.url=http://172.17.0.4:9000 -Dsonar.login=ef1c0a38b8d47603a8e7a86d4675a4830296e7ce'
+
+			}
+
+		}
+
+		stage('Email Sucess')
+		{
+
+			//emailext (
+			//	to: 'lucio.couto@protonmail.com',
+			//	subject: "Sucess Pipeline: ${currentBuild.fullDisplayName}",
+			//	body: "Sucess with ${env.BUILD_URL}"
+			//	)	 
+		}
+
+
+
+	}catch (e) {
+
+		stage('Email Failed')
+		{
+
+			emailext (
+				to: 'lucio.couto@protonmail.com',
+				subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+				body: "Something is wrong with ${env.BUILD_URL}"
+				)	 
+		}
+
+
+		throw e
+	}
+
+	
+}
